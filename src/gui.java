@@ -8,7 +8,7 @@ import java.awt.Color;
 import javax.swing.*;
 import java.lang.Math;
 import javax.swing.*;
-public class gui {
+public class gui extends EvilCalculator{
 	private static final int WINDOW_WIDTH = 600;
 	private static final int WINDOW_HEIGHT = 600;
 	private static final int BUTTON_WIDTH = 80;
@@ -46,7 +46,7 @@ public class gui {
         inText.setFont(new Font("Tahoma", Font.PLAIN, 33));
         window.add(inText);
         
-        history = new JTextArea("Ω3");
+        history = new JTextArea();
         history.setBounds(20, y[0], MARGIN_X-40, WINDOW_HEIGHT-2*MARGIN_Y);
         history.setEditable(false);
         history.setBackground(Color.WHITE);
@@ -191,12 +191,18 @@ public class gui {
         });
         
         btnEquals = initBtn("=",x[2],y[4], event -> {
+        	/*
         	if(Pattern.matches("[0]*",inText.getText())) {
         		inText.setText("7");
         	} else {
         		inText.setText("7");
+        		
         	}
+        	*/
+        	float result = this.compute(inText.getText());
+        	history.append(inText.getText() + " = " + result + "\n");
         	go = true;
+        	inText.setText("0");
         });
         
         btnClear = initBtn("C",x[3],y[4], event -> {
@@ -253,7 +259,10 @@ public class gui {
         return btn;
     }
 	
-	
+	public void setLevel(level l) {
+		disable(l.disableKeys);
+		
+	}
 }
 
 

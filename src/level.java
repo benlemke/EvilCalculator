@@ -2,24 +2,38 @@ import javax.swing.*;
 import java.util.function.Function;
                              
 
-
 public class level {
 	private int lvl;
-	private String name;
 	private float target;
-	private int disableKeys[];
+	public int disableKeys[];
 	private Function <Float, Float> omega;
 	private Function <Float, Float> theta1;
 	private Function <Float, Float> theta2;
-	public level(int lvl, float target, int[] dis, Function <Float, Float> o, Function <Float,Float> t) {
+	public level(int lvl, float target, int[] dis, Function <Float, Float> o) {
 		this.lvl = lvl;
-		name = "Level " + String.valueOf(lvl);
 		this.target = target;
 		disableKeys = dis;
 		omega = o;
 	}
-	public float solve(float val) {
-		return omega.apply(val);
+	
+	public level(int lvl, float target, int[] dis, Function <Float, Float> t1,Function <Float, Float> t2) {
+		this.lvl = lvl;
+		this.target = target;
+		disableKeys = dis;
+		theta1 = t1;
+		theta2 = t2;
 	}
+	
+	public float solve(String[] val, int index) {
+
+		if(val[index].equals("Ω")) {
+			return omega.apply(this.solve(val, index +1));
+		} else {
+			return Float.parseFloat(val[index]);
+		}
+		
+	}
+	
+	
 	
 }
