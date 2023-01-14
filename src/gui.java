@@ -16,26 +16,20 @@ public class gui extends EvilCalculator{
 	private static final int MARGIN_X = 210;
 	private static final int MARGIN_Y = 60;
 	
-	private JFrame window; // Main window
+	private JFrame window; 
 	private JComboBox levelCombo;
-	private JTextField inText; // Input
+	private JTextField inText; 
 	private JTextArea history;
 	private JLabel tLabel;
 	private JButton btnClear, btnEquals, btnPlusMin, btnOmega, btnTheta, 
 	     	btn0, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, 
 	     	btnDot, nextLvlBtn;
-	private JButton[] buttons = new JButton[13];
-	
-	
-	private char opt = ' '; // Save the operator
-	//private boolean addWrite = true; // Connect numbers in display
-	private double val = 0; // Save the value typed for calculation
+	private JButton[] buttons = new JButton[14];
 	public gui() {
 		window = new JFrame("EvilCalculator");
         window.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-        window.setLocationRelativeTo(null); // Move window to center
+        window.setLocationRelativeTo(null); 
 
-        
         int[] x = {MARGIN_X, MARGIN_X + 90, 390, 480, 570};
         int[] y = {MARGIN_Y, MARGIN_Y + 100, MARGIN_Y + 180, MARGIN_Y + 260, MARGIN_Y + 340, MARGIN_Y + 420};
         
@@ -43,9 +37,6 @@ public class gui extends EvilCalculator{
         nextLvlBtn.setBounds(MARGIN_X, y[5], 350, BUTTON_HEIGHT);
         nextLvlBtn.setFont(new Font("Tahoma", Font.PLAIN, 28));
         nextLvlBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
-        
-        
         
         inText = new JTextField("");
         inText.setBounds(x[0], y[0], 350, 70);
@@ -61,10 +52,10 @@ public class gui extends EvilCalculator{
         window.add(tLabel);
         
         levelCombo = new JComboBox();
-        levelCombo.setBounds(20, 30, 140, 25);
+        levelCombo.setBounds(20, 30, 60, 25);
         levelCombo.setToolTipText("Level");
         levelCombo.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        levelCombo.addItemListener(levelSwitch::accept);
+        levelCombo.addActionListener(levelSwitch);
         window.add(levelCombo);
         
         history = new JTextArea();
@@ -99,11 +90,9 @@ public class gui extends EvilCalculator{
         });
         
         btnOmega = initBtn("Ω",x[3],y[1], event -> {
-        	if(Pattern.matches("[0]*",inText.getText())) {
-        		inText.setText("Ω");
-        	} else {
+        	
         		inText.setText("Ω" + inText.getText() );
-        	}
+        	
         });
         
         btn4 = initBtn("4",x[0],y[2], event -> {
@@ -129,7 +118,6 @@ public class gui extends EvilCalculator{
         		inText.setText(inText.getText() + "6");
         	}
         });
-        
         
         btnTheta = initBtn("Θ",x[3],y[2], event -> {
         	if(Pattern.matches("[0]*",inText.getText())) {
@@ -164,7 +152,6 @@ public class gui extends EvilCalculator{
         });
         
         btnPlusMin = initBtn("±",x[3],y[3], event -> {
-        	
         	if(Pattern.matches("^Ω[0-9]+",inText.getText())) {
         		inText.setText("Ω-" +inText.getText().substring(1));
         		//inText.setText(inText.getText().substring(1));
@@ -182,10 +169,10 @@ public class gui extends EvilCalculator{
         });
         
         btnDot = initBtn(".",x[0],y[4], event -> {
-        	if(Pattern.matches("[0-9]+",inText.getText())) {
+        	if(Pattern.matches("[^.]*",inText.getText())) {
         		inText.setText(inText.getText()+".");
-        	} else if(Pattern.matches("",inText.getText())) {
-        		inText.setText(inText.getText() + "0.");
+        	} else if (Pattern.matches("",inText.getText())) {
+        		inText.setText(inText.getText()+".");
         	}
         });
         
@@ -197,44 +184,35 @@ public class gui extends EvilCalculator{
         	}
         });
         
-        ActionListener nexLvl = event -> {
-        	this.currentLevel++;
-        	setLevel(returnLvl());
+        ActionListener nextLvl = event -> {
+        	setLevel(nextLvl());
         	inText.setText("");
         	history.setText("");
-        	levelCombo.setSelectedIndex(this.currentLevel-1);
+        	levelCombo.setSelectedIndex(currentLevel-1);
         };
         
-        nextLvlBtn.addActionListener(nexLvl);
+        nextLvlBtn.addActionListener(nextLvl);
         nextLvlBtn.setFocusable(false);
         window.add(nextLvlBtn);
         
         btnEquals = initBtn("=",x[2],y[4], event -> {
-        	/*
-        	if(Pattern.matches("[0]*",inText.getText())) {
-        		inText.setText("7");
-        	} else {
-        		inText.setText("7");
-        		
+        	//if(Pattern.matches("\\-*(Ω)+\\.*\\-*\\d+",inText.getText())) {
+        	if(Pattern.matches(".*[Ω]+.*[\\d]+",inText.getText())) {
+	        	float result = Float.parseFloat(this.compute(inText.getText()));
+	        	if(result % 1 == 0) {
+	        		history.append(inText.getText() + " = " + (int)result + "\n");
+	            	inText.setText((int)result+"");
+	        	} else {
+	        		history.append(inText.getText() + " = " + result + "\n");
+	            	inText.setText(result+"");
+	        	}
+	        	if(result == this.returnTar()) {
+	        		tLabel.setBackground(Color.GREEN);
+	        		tLabel.setText("COMPLETE!");
+	        		nextLvlBtn.setVisible(true);
+	        	}
         	}
-        	*/
-        	float result = this.compute(inText.getText());
-        	if(result % 1 == 0) {
-        		history.append(inText.getText() + " = " + (int)result + "\n");
-            	inText.setText((int)result+"");
-        	} else {
-        		history.append(inText.getText() + " = " + result + "\n");
-            	inText.setText(result+"");
-        	}
-        	if(result == this.returnTar()) {
-        		tLabel.setText("COMPLETE!");
-        		nextLvlBtn.setVisible(true);
-        		//window.add(nextLvlBtn);
-        		
-        	}
-        	
         });
-        
         
         btnClear = initBtn("C",x[3],y[4], event -> {
         	if(Pattern.matches("[0]*",inText.getText())) {
@@ -257,33 +235,20 @@ public class gui extends EvilCalculator{
         buttons[10] = btnOmega;
         buttons[11] = btnTheta;
         buttons[12] = btnPlusMin;
+        buttons[13] = btnDot;
 
         window.setLayout(null);
         window.setResizable(false);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close button clicked? = End The process
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setVisible(true);
 	}
-	//private final JButton buttons[] = {btn0, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btnTheta, btnOmega};
-	//btn0, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btnTheta, btnOmega
 	public void disable(int[] keys) {
-		buttons[0].setEnabled(true);
-        buttons[1].setEnabled(true);
-        buttons[2].setEnabled(true);
-        buttons[3].setEnabled(true);
-        buttons[4].setEnabled(true);
-        buttons[5].setEnabled(true);
-        buttons[6].setEnabled(true);
-        buttons[7].setEnabled(true);
-        buttons[8].setEnabled(true);
-        buttons[9].setEnabled(true);
-        buttons[10].setEnabled(true);
-        buttons[11].setEnabled(true);
-        buttons[12].setEnabled(true);
-        nextLvlBtn.setVisible(false);
-        //window.remove(nextLvlBtn);
-		for(int i = 0; i < keys.length; i++) {
-			buttons[keys[i]].setEnabled(false);
-		}
+		nextLvlBtn.setVisible(false);
+		tLabel.setBackground(Color.BLACK);
+		for (int i = 0; i < buttons.length; i++) buttons[i].setEnabled(true);
+		for(int i = 0; i < keys.length; i++) buttons[keys[i]].setEnabled(false);
+			
+		
 	}
 	private JButton initBtn(String label, int x, int y, ActionListener event) {
         JButton btn = new JButton(label);
@@ -296,15 +261,22 @@ public class gui extends EvilCalculator{
         
         return btn;
     }
-	private Consumer<ItemEvent> levelSwitch = event -> {
-		if (event.getStateChange() != ItemEvent.SELECTED) return;
-		String selectedLevel =  (String)event.getItem();
+	private ActionListener levelSwitch = event -> {
+		String selectedLevel =  (String)levelCombo.getSelectedItem();
 		setLevel(returnLvl(selectedLevel));
-		
+		inText.setText("");
+    	history.setText("");
+    	
 	};
 	
 	public void setLevel(level l) {
-		if(l.lvl > levelCombo.getItemCount()) levelCombo.addItem(String.valueOf(l.lvl));
+		//remove action listening before adding to prevent duplicate levels added
+		levelCombo.removeActionListener(levelSwitch);
+		if(l.lvl > levelCombo.getItemCount()) 
+			if(levelCombo.getItemCount()==0) for(int i = 1; i <= l.lvl; i++) levelCombo.addItem(String.valueOf(i));
+			else levelCombo.addItem(String.valueOf(l.lvl));
+		levelCombo.addActionListener(levelSwitch);
+		levelCombo.setSelectedIndex(l.lvl-1);
 		disable(l.disableKeys);
 		tLabel.setText("Target: "+(int)l.target);
 	}

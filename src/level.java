@@ -9,35 +9,95 @@ public class level {
 	private Function <Float, Float> omega;
 	private Function <Float, Float> theta1;
 	private Function <Float, Float> theta2;
+	public level() {
+		
+	}
 	public level(int lvl, float target, int[] dis, Function <Float, Float> o) {
 		this.lvl = lvl;
 		this.target = target;
 		disableKeys = dis;
 		omega = o;
-		
 	}
 	
 	public level(int lvl, float target, int[] dis, Function <Float, Float> t1,Function <Float, Float> t2) {
 		this.lvl = lvl;
 		this.target = target;
-		disableKeys = dis;
+		this.disableKeys = dis;
 		theta1 = t1;
 		theta2 = t2;
 		
 	}
 	
-	public float solve(String[] val, int index) {
+	public String solve(String[] val, int index) {
 
 		if(val[index].equals("Ω")) {
-			return omega.apply(this.solve(val, index +1));
+			return String.valueOf(omega.apply(Float.parseFloat(solve(val, index +1))));
 		} else if(val[index].equals("-Ω")) {
-			return omega.apply(this.solve(val, index +1)) * -1;
+			return String.valueOf(omega.apply(Float.parseFloat(solve(val, index +1))* -1));
 		} else {
-			return Float.parseFloat(val[index]);
+			return val[index];
 		}
 		
 	}
 	
-	
-	
 }
+
+class NAlevel extends level {
+	private Function <String, String> stringOmega;
+	public NAlevel(int lvl, float target, int[] dis, Function <String, String> so) {
+		this.lvl = lvl;
+		this.target = target;
+		disableKeys = dis;
+		stringOmega = so;
+	}
+	
+	@Override public String solve(String[] val, int index) {
+		if(val[index].equals("Ω")) {
+			return stringOmega.apply(solve(val, index +1));
+		} else if(val[index].equals("-Ω")) {
+			return "-" + stringOmega.apply(solve(val, index +1));
+		} else {
+			return val[index];
+		}
+		
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
