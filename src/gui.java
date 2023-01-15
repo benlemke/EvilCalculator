@@ -23,7 +23,7 @@ public class gui extends EvilCalculator{
 	private JLabel tLabel;
 	private JButton btnClear, btnEquals, btnPlusMin, btnOmega, btnTheta, 
 	     	btn0, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, 
-	     	btnDot, nextLvlBtn;
+	     	btnDot, btnNextLvl, btnWolfram;
 	private JButton[] buttons = new JButton[14];
 	public gui() {
 		window = new JFrame("EvilCalculator");
@@ -33,10 +33,10 @@ public class gui extends EvilCalculator{
         int[] x = {MARGIN_X, MARGIN_X + 90, 390, 480, 570};
         int[] y = {MARGIN_Y, MARGIN_Y + 100, MARGIN_Y + 180, MARGIN_Y + 260, MARGIN_Y + 340, MARGIN_Y + 420};
         
-        nextLvlBtn = new JButton("Next Level->");
-        nextLvlBtn.setBounds(MARGIN_X, y[5], 350, BUTTON_HEIGHT);
-        nextLvlBtn.setFont(new Font("Tahoma", Font.PLAIN, 28));
-        nextLvlBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnNextLvl = new JButton("Next Level->");
+        btnNextLvl.setBounds(MARGIN_X, y[5], 350, BUTTON_HEIGHT);
+        btnNextLvl.setFont(new Font("Tahoma", Font.PLAIN, 28));
+        btnNextLvl.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         inText = new JTextField("");
         inText.setBounds(x[0], y[0], 350, 70);
@@ -57,6 +57,14 @@ public class gui extends EvilCalculator{
         levelCombo.setCursor(new Cursor(Cursor.HAND_CURSOR));
         levelCombo.addActionListener(levelSwitch);
         window.add(levelCombo);
+        
+        btnWolfram = new JButton("Wolfram");
+        btnWolfram.setBounds(90, 30, 100, 25);
+        btnWolfram.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        btnWolfram.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnWolfram.addActionListener(event -> openWolfram());
+        btnWolfram.setFocusable(false);
+        window.add(btnWolfram);
         
         history = new JTextArea();
         history.setBounds(20, y[0], MARGIN_X-40, WINDOW_HEIGHT-2*MARGIN_Y);
@@ -191,14 +199,15 @@ public class gui extends EvilCalculator{
         	levelCombo.setSelectedIndex(currentLevel-1);
         };
         
-        nextLvlBtn.addActionListener(nextLvl);
-        nextLvlBtn.setFocusable(false);
-        window.add(nextLvlBtn);
+        btnNextLvl.addActionListener(nextLvl);
+        btnNextLvl.setFocusable(false);
+        window.add(btnNextLvl);
         
         btnEquals = initBtn("=",x[2],y[4], event -> {
         	//if(Pattern.matches("\\-*(Ω)+\\.*\\-*\\d+",inText.getText())) {
         	if(Pattern.matches(".*[Ω]+.*[\\d]+",inText.getText())) {
 	        	float result = Float.parseFloat(this.compute(inText.getText()));
+	        	if(addHistory(getX(inText.getText()),result) > 1) btnWolfram.setEnabled(true);
 	        	if(result % 1 == 0) {
 	        		history.append(inText.getText() + " = " + (int)result + "\n");
 	            	inText.setText((int)result+"");
@@ -209,7 +218,7 @@ public class gui extends EvilCalculator{
 	        	if(result == this.returnTar()) {
 	        		tLabel.setBackground(Color.GREEN);
 	        		tLabel.setText("COMPLETE!");
-	        		nextLvlBtn.setVisible(true);
+	        		btnNextLvl.setVisible(true);
 	        	}
         	}
         });
@@ -243,7 +252,8 @@ public class gui extends EvilCalculator{
         window.setVisible(true);
 	}
 	public void disable(int[] keys) {
-		nextLvlBtn.setVisible(false);
+		btnWolfram.setEnabled(false);
+		btnNextLvl.setVisible(false);
 		tLabel.setBackground(Color.BLACK);
 		for (int i = 0; i < buttons.length; i++) buttons[i].setEnabled(true);
 		for(int i = 0; i < keys.length; i++) buttons[keys[i]].setEnabled(false);
@@ -277,6 +287,7 @@ public class gui extends EvilCalculator{
 			else levelCombo.addItem(String.valueOf(l.lvl));
 		levelCombo.addActionListener(levelSwitch);
 		levelCombo.setSelectedIndex(l.lvl-1);
+		this.wolframHistory.clear();
 		disable(l.disableKeys);
 		tLabel.setText("Target: "+(int)l.target);
 	}

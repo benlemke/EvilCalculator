@@ -1,14 +1,32 @@
-
-
+import java.awt.Desktop;
+import java.net.URI;
+import java.util.List;
+import java.util.ArrayList;
+class entry {
+	public float x;
+	public float y;
+	public entry(float x, float y) {
+		this.x = x;
+		this.y = y;
+	}
+}
 public class EvilCalculator {
 	public static int currentLevel = 5;
 	private static level levels[] = new level[100];
-	public int s = 1;
+	public List<entry>  wolframHistory = new ArrayList<>();
 	public String compute(String input) {
 		String[] parse = input.split("(?<=Ω)");
-		for(int i = 0; i < parse.length; i++) System.out.print(parse[i] + " ");
-		System.out.println("");
+
 		return levels[currentLevel].solve(parse, 0);
+	}
+	
+	public float getX(String input) {
+		String[] parse = input.split("(?<=Ω)");
+		float result = 0;
+		for(int i = 0; i < parse.length; i++)
+			if(!(parse[i].equals("-Ω") || parse[i].equals("Ω"))) 
+				result = Float.parseFloat(parse[i]);
+		return result;
 	}
 	
 	public level returnLvl(String l) {
@@ -17,6 +35,7 @@ public class EvilCalculator {
 	}
 	
 	public level nextLvl() {
+		wolframHistory.clear();
 		currentLevel++;
 		return levels[currentLevel];
 	}
@@ -24,6 +43,32 @@ public class EvilCalculator {
 	public float returnTar() {
 		return levels[currentLevel].target;
 	}
+	
+	public int addHistory(float x, float y) {
+		wolframHistory.add(new entry(x,y));
+		return wolframHistory.size();
+	}
+	
+	public void openWolfram() {
+		String url = "https://www.wolframalpha.com/input?i=";
+		for(int i = 0; i < wolframHistory.size(); i++) {
+			url += "%7B";
+			url += wolframHistory.get(i).x;
+			url += "%2C";
+			url += wolframHistory.get(i).y;
+			url += "%7D";
+			url += "%2C";
+		}
+		try {
+			  Desktop desktop = java.awt.Desktop.getDesktop();
+			  
+			  URI oURL = new URI(url);
+			  desktop.browse(oURL);
+			} catch (Exception e) {
+			  e.printStackTrace();
+			}	
+	}
+	
 	public static void main(String[] args) {
 		gui game = new gui();
 		
